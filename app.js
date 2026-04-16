@@ -103,6 +103,88 @@ function render(query) {
   chatSection.classList.remove("hidden");
 }
 
+// Enhanced cards: LLM picks 3 specific products and we build store links per pick
+const PICKS_PROMPT = `Eres un experto en compras. Para la búsqueda del usuario, recomienda 3 productos específicos en JSON válido (sin markdown, sin texto extra):
+
+{
+  "quality": {"product": "nombre modelo exacto y variante", "price": "rango USD aproximado", "reason": "1 frase justificando"},
+  "value": {"product": "...", "price": "...", "reason": "..."},
+  "cheap": {"product": "...", "price": "...", "reason": "..."}
+}
+
+"quality" = la mejor opción sin importar precio
+"value" = la mejor relación calidad-precio
+"cheap" = alternativa económica con buena calidad mínima
+
+Sé específico con modelos/variantes reales (ej. "iPhone 15 128GB", no "iPhone"). Si la búsqueda es un servicio (ej. tarjetas de crédito), sugiere productos/marcas específicas del mercado latino.
+
+Responde SOLO el JSON, nada más.`;
+
+function extractJson(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  return match ? match[0] : text;
+}
+
+async function generateSmartPicks(query) {
+  if (!hasApiKey()) return;
+  const picksEl = document.getElementById("smart-picks");
+  picksEl.classList.remove("hidden");
+  picksEl.innerHTML = `<div class="picks-loading">🤖 Analizando y buscando las 3 mejores opciones para "${escapeHtml(query)}"...</div>`;
+  try {
+    const raw = await callLLM(
+      [
+        { role: "system", content: PICKS_PROMPT },
+        { role: "user", content: query },
+      ],
+      { maxTokens: 500, temperature: 0.4 }
+    );
+    const data = JSON.parse(extractJson(raw));
+    renderSmartPicks(data, query);
+  } catch (err) {
+    picksEl.innerHTML = `<div class="picks-error">⚠️ No pude generar recomendaciones específicas: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function smartPickCard(tierId, pick, query) {
+  const tier = STORE_TIERS.find((t) => t.id === tierId);
+  if (!tier || !pick || !pick.product) return "";
+  const searchQuery = pick.product;
+  const primary = tier.stores[0];
+  const others = tier.stores.slice(1, 4);
+  const primaryUrl = buildUrl(primary.url, searchQuery);
+  const otherLinks = others
+    .map((s) => `<a class="store-link" href="${buildUrl(s.url, searchQuery)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
+    .join("");
+  return `
+    <article class="result-card tier-${tier.id}">
+      <span class="badge ${tier.id}">${tier.badge}</span>
+      <h3>${escapeHtml(pick.product)}</h3>
+      <p class="pick-price">💵 ${escapeHtml(pick.price || "Precio variable")}</p>
+      <p class="tier-desc">${escapeHtml(pick.reason || "")}</p>
+      <a class="card-link primary" href="${primaryUrl}" target="_blank" rel="noopener">
+        Ver "${escapeHtml(pick.product)}" en ${escapeHtml(primary.name)} →
+      </a>
+      <div class="store-links">
+        <span class="store-links-label">También buscar en:</span>
+        ${otherLinks}
+      </div>
+    </article>
+  `;
+}
+
+function renderSmartPicks(data, query) {
+  const picksEl = document.getElementById("smart-picks");
+  const html = [
+    `<h2 class="picks-title">🎯 Las 3 mejores opciones según la IA</h2>`,
+    `<div class="picks-grid">`,
+    smartPickCard("quality", data.quality, query),
+    smartPickCard("value", data.value, query),
+    smartPickCard("cheap", data.cheap, query),
+    `</div>`,
+  ].join("");
+  picksEl.innerHTML = html;
+}
+
 function showStatus(text) {
   statusEl.textContent = text;
   statusEl.classList.remove("hidden");
@@ -255,6 +337,7 @@ form.addEventListener("submit", (e) => {
   render(query);
   recordSearch(query);
   generateSearchSummary(query);
+  generateSmartPicks(query);
   aiSummary.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
