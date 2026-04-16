@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ahorra IA — Encuentra las mejores ofertas con inteligencia artificial</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <div class="logo">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">Ahorra<strong>IA</strong></span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#buscar">Buscar</a></li>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#preferencias">Mis preferencias</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-content">
+      <h1>Compra inteligente. <span class="accent">Ahorra más.</span></h1>
+      <p class="subtitle">
+        Analizamos miles de productos en toda la web y te entregamos solo las 3 mejores opciones:
+        la de mayor calidad, la mejor relación calidad-precio y la alternativa más económica.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section id="buscar" class="search-section">
+      <form id="search-form" class="search-box">
+        <input
+          type="text"
+          id="query"
+          placeholder="¿Qué estás buscando? Ej: audífonos inalámbricos, laptop para estudiar..."
+          autocomplete="off"
+        />
+        <button type="submit">Buscar ofertas</button>
+      </form>
+
+      <details class="filters">
+        <summary>Filtros avanzados · especifica tu búsqueda</summary>
+        <div class="filter-grid">
+          <label>
+            Presupuesto máximo (USD)
+            <input type="number" id="budget" placeholder="Ej: 200" min="0" />
+          </label>
+          <label>
+            Marca preferida
+            <input type="text" id="brand" placeholder="Ej: Sony, Samsung..." />
+          </label>
+          <label>
+            Prioridad
+            <select id="priority">
+              <option value="balanced">Equilibrado</option>
+              <option value="quality">Calidad ante todo</option>
+              <option value="price">Precio bajo</option>
+            </select>
+          </label>
+          <label>
+            Categoría
+            <select id="category">
+              <option value="">Todas</option>
+              <option value="audio">Audio</option>
+              <option value="computo">Cómputo</option>
+              <option value="hogar">Hogar</option>
+              <option value="deporte">Deporte</option>
+              <option value="moda">Moda</option>
+            </select>
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <section id="status" class="status hidden"></section>
+
+    <section id="results" class="results"></section>
+
+    <section id="chat" class="chat hidden">
+      <h2>Habla con Ahorra IA</h2>
+      <p class="chat-hint">
+        ¿Tienes dudas sobre alguna opción? Pregunta lo que necesites para decidir con criterio.
+      </p>
+      <div id="chat-log" class="chat-log"></div>
+      <form id="chat-form" class="chat-form">
+        <input
+          type="text"
+          id="chat-input"
+          placeholder="Ej: ¿cuál dura más batería? ¿vale la pena pagar más?"
+          autocomplete="off"
+        />
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <section id="como-funciona" class="how">
+      <h2>Cómo funciona</h2>
+      <div class="how-grid">
+        <article>
+          <span class="step">10</span>
+          <h3>Comprender al usuario</h3>
+          <p>
+            Analizamos información con IA para entender cómo compra cada persona:
+            gustos, preferencias y hábitos.
+          </p>
+        </article>
+        <article>
+          <span class="step">11</span>
+          <h3>Filtrar información</h3>
+          <p>
+            Procesamos miles de productos constantemente y filtramos las mejores
+            opciones según lo que realmente buscas.
+          </p>
+        </article>
+        <article>
+          <span class="step">12</span>
+          <h3>Adaptarse al mercado</h3>
+          <p>
+            El sistema se actualiza en continuo: nuevos productos, próximos lanzamientos
+            y lo que ya no está disponible.
+          </p>
+        </article>
+        <article>
+          <span class="step">13</span>
+          <h3>Decidir con criterio</h3>
+          <p>
+            Seleccionamos 3 opciones clave: mejor calidad, mejor relación calidad-precio
+            y alternativa más económica.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="preferencias" class="prefs">
+      <h2>Mis preferencias</h2>
+      <p>
+        Ahorra IA aprende de tus búsquedas para mejorar recomendaciones futuras.
+      </p>
+      <div id="prefs-box" class="prefs-box">
+        <p class="prefs-empty">Aún no tenemos búsquedas registradas. ¡Empieza a buscar!</p>
+      </div>
+      <button id="clear-prefs" class="clear-btn">Borrar historial</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Ahorra IA · Compara. Decide. Ahorra.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
