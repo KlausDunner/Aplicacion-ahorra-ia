@@ -5,7 +5,6 @@ const $ = (sel) => document.querySelector(sel);
 
 const form = $("#search-form");
 const queryInput = $("#query");
-const resultsEl = $("#results");
 const statusEl = $("#status");
 const aiSummary = $("#ai-summary");
 const aiSummaryContent = $("#ai-summary-content");
@@ -74,36 +73,8 @@ function buildUrl(template, query) {
 }
 
 // ---------- Render ----------
-function tierCard(tier, query) {
-  const primary = tier.stores[tier.primary];
-  const others = tier.stores.filter((_, i) => i !== tier.primary);
-  const primaryUrl = buildUrl(primary.url, query);
-  const otherLinks = others
-    .map((s) => `<a class="store-link" href="${buildUrl(s.url, query)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
-    .join("");
-  return `
-    <article class="result-card tier-${tier.id}">
-      <span class="badge ${tier.id}">${tier.badge}</span>
-      <h3>${escapeHtml(tier.tagline)}</h3>
-      <p class="tier-desc">${escapeHtml(tier.desc)}</p>
-      <a class="card-link primary" href="${primaryUrl}" target="_blank" rel="noopener">
-        Ver en ${escapeHtml(primary.name)} →
-      </a>
-      <div class="store-links">
-        <span class="store-links-label">También buscar en:</span>
-        ${otherLinks}
-      </div>
-    </article>
-  `;
-}
+// La IA genera 3 productos específicos con URLs reales vía web search.
 
-function render(query) {
-  resultsEl.innerHTML = STORE_TIERS.map((t) => tierCard(t, query)).join("");
-  showStatus(`Resultados para "${query}" en ${STORE_TIERS.reduce((n, t) => n + t.stores.length, 0)} tiendas y comparadores.`);
-  chatSection.classList.remove("hidden");
-}
-
-// Enhanced cards: LLM picks 3 specific products and we build store links per pick
 const PICKS_PROMPT = `Eres Ahorra IA. BUSCA EN INTERNET productos reales para el usuario y devuelve 3 opciones con URLs directas a la página de compra (no búsquedas).
 
 Responde en JSON válido, sin markdown, sin texto extra:
@@ -361,7 +332,12 @@ form.addEventListener("submit", (e) => {
   lastQuery = query;
   chatHistory = [];
   chatLog.innerHTML = "";
-  render(query);
+  chatSection.classList.remove("hidden");
+  if (!hasApiKey()) {
+    showStatus(`Para ver las 3 mejores opciones con precios reales, configura tu API key (⚙️ arriba).`);
+  } else {
+    showStatus(`Buscando las mejores opciones para "${query}"...`);
+  }
   recordSearch(query);
   generateSearchSummary(query);
   generateSmartPicks(query);
