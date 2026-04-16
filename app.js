@@ -75,31 +75,31 @@ function buildUrl(template, query) {
 // ---------- Render ----------
 // La IA genera 3 productos específicos con URLs reales vía web search.
 
-const PICKS_PROMPT = `Eres Ahorra IA, asistente de compras para CHILE. BUSCA EN INTERNET en tiendas CHILENAS y devuelve 3 opciones con URLs directas a la página de compra.
+const PICKS_PROMPT = `Eres Ahorra IA, asistente de compras para CHILE. BUSCA EN INTERNET en tiendas CHILENAS y devuelve 3 opciones con el modelo exacto, precio real actual en CLP y la tienda donde se vende.
 
 Responde en JSON válido, sin markdown, sin texto extra:
 
 {
   "quality": {
-    "product": "nombre exacto del modelo y variante",
-    "price": "precio real en pesos chilenos (ej: $899.990 CLP)",
-    "store": "nombre de la tienda chilena",
-    "url": "URL DIRECTA al producto en la tienda chilena",
+    "product": "nombre exacto del modelo y variante (ej: 'iPhone 15 128GB Negro')",
+    "price": "precio real en CLP (ej: '$899.990 CLP')",
+    "store": "Falabella | Paris | Ripley | MercadoLibre Chile | Lider | PC Factory | SP Digital | Sodimac | La Polar | Hites | AbcDin",
     "reason": "1 frase justificando"
   },
-  "value": {"product": "...", "price": "...", "store": "...", "url": "...", "reason": "..."},
-  "cheap": {"product": "...", "price": "...", "store": "...", "url": "...", "reason": "..."}
+  "value": {"product": "...", "price": "...", "store": "...", "reason": "..."},
+  "cheap": {"product": "...", "price": "...", "store": "...", "reason": "..."}
 }
 
-REGLAS OBLIGATORIAS:
-- TODAS las URLs deben ser de tiendas chilenas (.cl) o de tiendas con envío oficial a Chile
-- Tiendas permitidas: Falabella (falabella.com/falabella-cl), Paris (paris.cl), Ripley (ripley.cl), Sodimac, PC Factory (pcfactory.cl), SP Digital (spdigital.cl), MercadoLibre Chile (mercadolibre.cl), Lider (lider.cl), La Polar (lapolar.cl), Hites, AbcDin, Jumbo, Tottus. También AliExpress pero solo si tiene envío oficial a Chile.
-- NO usar Amazon USA, Walmart USA, BestBuy, Apple.com/us, El Corte Inglés, ni tiendas que no venden a Chile
-- Precios SIEMPRE en pesos chilenos (CLP) con formato "$1.234.567 CLP"
-- quality = mejor opción absoluta disponible en Chile
-- value = mejor calidad-precio disponible en Chile
-- cheap = alternativa económica comprable en Chile
-- Si el usuario busca un servicio (tarjeta de crédito, seguro), sugiere productos de bancos/empresas chilenas (BancoEstado, Falabella, Scotiabank, Santander, BCI, Itaú, Banco de Chile, etc.)
+REGLAS:
+- NO incluyas URLs. La app las construye.
+- store debe ser UNA sola tienda chilena real de la lista, escrita exactamente así
+- product debe ser específico con modelo + variante (capacidad, color, tamaño, etc.)
+- price actual en CLP con formato "$1.234.567 CLP"
+- quality = mejor opción absoluta en Chile hoy
+- value = mejor calidad-precio en Chile hoy
+- cheap = la más barata con calidad aceptable en Chile hoy
+- Para servicios financieros sugiere bancos chilenos: BancoEstado, BCI, Santander Chile, Banco de Chile, Scotiabank, Falabella, Itaú
+- Verifica en tu búsqueda que el producto esté disponible HOY en la tienda
 
 Responde SOLO el JSON.`;
 
@@ -141,17 +141,31 @@ async function generateSmartPicks(query) {
   }
 }
 
-function isValidUrl(u) {
-  try { return /^https?:\/\//.test(u) && new URL(u); } catch { return false; }
+// Busca una tienda chilena en STORE_TIERS por nombre aproximado (tolera variaciones).
+function findChileanStore(name) {
+  const n = (name || "").toLowerCase().trim();
+  if (!n) return null;
+  const all = STORE_TIERS.flatMap((t) => t.stores);
+  // Match exacto
+  let found = all.find((s) => s.name.toLowerCase() === n);
+  if (found) return found;
+  // Match por palabra clave (falabella, paris, ripley, etc.)
+  const keywords = ["falabella", "paris", "ripley", "mercadolibre", "lider", "pc factory", "pcfactory", "sp digital", "spdigital", "sodimac", "la polar", "hites", "abcdin", "jumbo", "tottus"];
+  for (const kw of keywords) {
+    if (n.includes(kw)) {
+      found = all.find((s) => s.name.toLowerCase().includes(kw) || s.name.toLowerCase().replace(/\s/g, "").includes(kw.replace(/\s/g, "")));
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 function smartPickCard(tierId, pick, query) {
   const tier = STORE_TIERS.find((t) => t.id === tierId);
   if (!tier || !pick || !pick.product) return "";
-  const hasRealUrl = isValidUrl(pick.url);
-  const primaryUrl = hasRealUrl ? pick.url : buildUrl(tier.stores[0].url, pick.product);
-  const primaryStore = hasRealUrl && pick.store ? pick.store : tier.stores[0].name;
-  const altStores = tier.stores.slice(0, 4);
+  const suggested = findChileanStore(pick.store) || tier.stores[0];
+  const primaryUrl = buildUrl(suggested.url, pick.product);
+  const altStores = tier.stores.filter((s) => s.name !== suggested.name).slice(0, 4);
   const otherLinks = altStores
     .map((s) => `<a class="store-link" href="${buildUrl(s.url, pick.product)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
     .join("");
@@ -162,10 +176,10 @@ function smartPickCard(tierId, pick, query) {
       <p class="pick-price">💵 ${escapeHtml(pick.price || "Precio variable")}</p>
       <p class="tier-desc">${escapeHtml(pick.reason || "")}</p>
       <a class="card-link primary" href="${primaryUrl}" target="_blank" rel="noopener">
-        ${hasRealUrl ? "🛒 Comprar" : "🔎 Buscar"} en ${escapeHtml(primaryStore)} →
+        🔎 Ver en ${escapeHtml(suggested.name)} →
       </a>
       <div class="store-links">
-        <span class="store-links-label">También buscar este producto en:</span>
+        <span class="store-links-label">También buscar en otras tiendas chilenas:</span>
         ${otherLinks}
       </div>
     </article>
