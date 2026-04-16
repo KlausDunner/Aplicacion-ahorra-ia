@@ -35,44 +35,14 @@
         <input
           type="text"
           id="query"
-          placeholder="¿Qué estás buscando? Ej: audífonos inalámbricos, laptop para estudiar..."
+          placeholder="Busca cualquier cosa: laptop, tarjeta de crédito, baño, lápices, seguro de auto..."
           autocomplete="off"
         />
         <button type="submit">Buscar ofertas</button>
       </form>
-
-      <details class="filters">
-        <summary>Filtros avanzados · especifica tu búsqueda</summary>
-        <div class="filter-grid">
-          <label>
-            Presupuesto máximo (USD)
-            <input type="number" id="budget" placeholder="Ej: 200" min="0" />
-          </label>
-          <label>
-            Marca preferida
-            <input type="text" id="brand" placeholder="Ej: Sony, Samsung..." />
-          </label>
-          <label>
-            Prioridad
-            <select id="priority">
-              <option value="balanced">Equilibrado</option>
-              <option value="quality">Calidad ante todo</option>
-              <option value="price">Precio bajo</option>
-            </select>
-          </label>
-          <label>
-            Categoría
-            <select id="category">
-              <option value="">Todas</option>
-              <option value="audio">Audio</option>
-              <option value="computo">Cómputo</option>
-              <option value="hogar">Hogar</option>
-              <option value="deporte">Deporte</option>
-              <option value="moda">Moda</option>
-            </select>
-          </label>
-        </div>
-      </details>
+      <p class="search-hint">
+        Funciona con <strong>cualquier producto o servicio</strong>. Te entregamos links directos a las mejores tiendas y comparadores.
+      </p>
     </section>
 
     <section id="status" class="status hidden"></section>
