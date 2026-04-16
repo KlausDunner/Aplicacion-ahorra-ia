@@ -1,6 +1,5 @@
-// Ahorra IA - Motor de búsqueda universal
-// Para cualquier consulta genera links reales a múltiples tiendas/comparadores
-// organizados en 4 estrategias: calidad-precio, calidad, económica y universal.
+// Ahorra IA - App principal
+// Búsqueda universal de links + chat inteligente vía Groq LLM.
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -8,31 +7,37 @@ const form = $("#search-form");
 const queryInput = $("#query");
 const resultsEl = $("#results");
 const statusEl = $("#status");
+const aiSummary = $("#ai-summary");
+const aiSummaryContent = $("#ai-summary-content");
+const aiSummaryStatus = $("#ai-summary-status");
 const chatSection = $("#chat");
 const chatLog = $("#chat-log");
 const chatForm = $("#chat-form");
 const chatInput = $("#chat-input");
 const prefsBox = $("#prefs-box");
 const clearPrefsBtn = $("#clear-prefs");
+const configBtn = $("#config-btn");
+const configModal = $("#config-modal");
+const modalClose = $("#modal-close");
+const apiKeyInput = $("#api-key-input");
+const saveKeyBtn = $("#save-key");
+const clearKeyBtn = $("#clear-key");
+const configStatus = $("#config-status");
 
 const PREFS_KEY = "ahorraia.prefs.v2";
 let lastQuery = "";
+let chatHistory = [];
 
-// ---------- Preferencias del usuario ----------
+// ---------- Preferencias ----------
 function loadPrefs() {
-  try {
-    return JSON.parse(localStorage.getItem(PREFS_KEY)) || { history: [] };
-  } catch {
-    return { history: [] };
-  }
+  try { return JSON.parse(localStorage.getItem(PREFS_KEY)) || { history: [] }; }
+  catch { return { history: [] }; }
 }
-function savePrefs(p) {
-  localStorage.setItem(PREFS_KEY, JSON.stringify(p));
-}
-function recordSearch(query) {
-  if (!query) return;
+function savePrefs(p) { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); }
+function recordSearch(q) {
+  if (!q) return;
   const prefs = loadPrefs();
-  prefs.history = [query, ...prefs.history.filter((q) => q !== query)].slice(0, 10);
+  prefs.history = [q, ...prefs.history.filter((x) => x !== q)].slice(0, 10);
   savePrefs(prefs);
   renderPrefs();
 }
@@ -59,21 +64,13 @@ clearPrefsBtn.addEventListener("click", () => {
   renderPrefs();
 });
 
-// ---------- Construcción de URLs ----------
+// ---------- URLs ----------
 function slugify(str) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
 }
-
 function buildUrl(template, query) {
-  return template
-    .replace("{slug}", slugify(query))
-    .replace("{q}", encodeURIComponent(query));
+  return template.replace("{slug}", slugify(query)).replace("{q}", encodeURIComponent(query));
 }
 
 // ---------- Render ----------
@@ -82,12 +79,8 @@ function tierCard(tier, query) {
   const others = tier.stores.filter((_, i) => i !== tier.primary);
   const primaryUrl = buildUrl(primary.url, query);
   const otherLinks = others
-    .map(
-      (s) =>
-        `<a class="store-link" href="${buildUrl(s.url, query)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`
-    )
+    .map((s) => `<a class="store-link" href="${buildUrl(s.url, query)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
     .join("");
-
   return `
     <article class="result-card tier-${tier.id}">
       <span class="badge ${tier.id}">${tier.badge}</span>
@@ -106,9 +99,7 @@ function tierCard(tier, query) {
 
 function render(query) {
   resultsEl.innerHTML = STORE_TIERS.map((t) => tierCard(t, query)).join("");
-  showStatus(
-    `Resultados para "${query}" en ${STORE_TIERS.reduce((n, t) => n + t.stores.length, 0)} tiendas y comparadores.`
-  );
+  showStatus(`Resultados para "${query}" en ${STORE_TIERS.reduce((n, t) => n + t.stores.length, 0)} tiendas y comparadores.`);
   chatSection.classList.remove("hidden");
 }
 
@@ -123,25 +114,81 @@ function escapeHtml(str) {
   }[c]));
 }
 
-// ---------- Eventos ----------
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const query = queryInput.value.trim();
-  if (!query) return;
-  lastQuery = query;
-  render(query);
-  recordSearch(query);
-  resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
-});
+// ---------- Resumen IA al buscar ----------
+const SEARCH_PROMPT = `Eres Ahorra IA, asistente de compras en español chileno/latino. El usuario buscó un producto o servicio. Da un resumen corto y útil.
 
-// ---------- Chat ----------
-chatForm.addEventListener("submit", (e) => {
+Formato obligatorio (usa saltos de línea, sin markdown):
+1) Qué es / qué buscar (1 oración)
+2) Rango de precio típico en USD (si lo sabes; dilo con "aproximado")
+3) 2-3 modelos o variantes específicas a buscar (para que el usuario tenga nombres concretos)
+4) 1 tip clave para elegir
+
+Máximo 80 palabras. Directo, sin introducciones ni despedidas.`;
+
+async function generateSearchSummary(query) {
+  if (!hasApiKey()) {
+    aiSummary.classList.remove("hidden");
+    aiSummaryContent.innerHTML = `💡 Activa el chat inteligente: <button id="open-config-inline" class="inline-btn">configurar IA gratis</button>`;
+    $("#open-config-inline")?.addEventListener("click", openConfig);
+    aiSummaryStatus.textContent = "";
+    return;
+  }
+  aiSummary.classList.remove("hidden");
+  aiSummaryStatus.textContent = "Pensando...";
+  aiSummaryContent.textContent = "";
+  try {
+    const text = await callLLM(
+      [
+        { role: "system", content: SEARCH_PROMPT },
+        { role: "user", content: `Búsqueda: "${query}"` },
+      ],
+      { maxTokens: 250, temperature: 0.5 }
+    );
+    aiSummaryContent.textContent = text;
+    aiSummaryStatus.textContent = "";
+  } catch (err) {
+    aiSummaryContent.textContent = `⚠️ ${err.message}`;
+    aiSummaryStatus.textContent = "";
+  }
+}
+
+// ---------- Chat IA ----------
+const CHAT_SYSTEM_PROMPT = `Eres Ahorra IA, asistente de compras inteligente en español.
+
+Reglas:
+- Responde preguntas factuales sobre productos (specs, batería, cámara, comparaciones, pros/cons) usando tu conocimiento. Sé específico con datos concretos.
+- Para precios actuales o stock en tiempo real: di que no tienes ese dato y sugiere dónde revisarlo (tiendas de la app).
+- Respuestas concisas: 2-4 oraciones. Sin relleno. Sin introducciones.
+- Tono amigable y directo. Español latino neutro.
+- Si el usuario solo saluda, salúdalo y pregunta qué necesita.`;
+
+chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const text = chatInput.value.trim();
   if (!text) return;
   appendMsg("user", text);
   chatInput.value = "";
-  setTimeout(() => appendMsg("bot", answer(text, lastQuery)), 350);
+
+  if (!hasApiKey()) {
+    appendMsg("bot", "Para respuestas inteligentes necesito una API key gratuita. Haz clic en ⚙️ Configurar IA arriba (toma 30 segundos).");
+    return;
+  }
+
+  chatHistory.push({ role: "user", content: text });
+  const context = lastQuery ? `\n\nContexto: el usuario está investigando "${lastQuery}".` : "";
+  const messages = [
+    { role: "system", content: CHAT_SYSTEM_PROMPT + context },
+    ...chatHistory.slice(-10),
+  ];
+
+  const loadingMsg = appendMsg("bot", "Pensando…");
+  try {
+    const response = await callLLM(messages, { maxTokens: 400, temperature: 0.6 });
+    loadingMsg.textContent = response;
+    chatHistory.push({ role: "assistant", content: response });
+  } catch (err) {
+    loadingMsg.textContent = `⚠️ ${err.message}`;
+  }
 });
 
 function appendMsg(role, text) {
@@ -150,39 +197,60 @@ function appendMsg(role, text) {
   div.textContent = text;
   chatLog.appendChild(div);
   chatLog.scrollTop = chatLog.scrollHeight;
+  return div;
 }
 
-function normalize(s) {
-  return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+// ---------- Config modal ----------
+function openConfig() {
+  apiKeyInput.value = getApiKey();
+  configModal.classList.remove("hidden");
+  updateConfigStatus();
+}
+function closeConfig() { configModal.classList.add("hidden"); }
+function updateConfigBtn() {
+  configBtn.textContent = hasApiKey() ? "✅ IA conectada" : "⚙️ Configurar IA";
+}
+function updateConfigStatus() {
+  configStatus.textContent = hasApiKey()
+    ? "✅ Key guardada. El chat y el resumen están activos."
+    : "❌ Sin key configurada.";
 }
 
-function answer(q, query) {
-  const n = normalize(q);
-  if (!query) return "Primero busca un producto arriba y luego te ayudo a decidir.";
+configBtn.addEventListener("click", openConfig);
+modalClose.addEventListener("click", closeConfig);
+configModal.addEventListener("click", (e) => { if (e.target === configModal) closeConfig(); });
+saveKeyBtn.addEventListener("click", () => {
+  const k = apiKeyInput.value.trim();
+  if (!k.startsWith("gsk_")) {
+    alert("La key debe empezar con 'gsk_'. Revisa que la hayas copiado completa.");
+    return;
+  }
+  setApiKey(k);
+  updateConfigBtn();
+  updateConfigStatus();
+  setTimeout(closeConfig, 800);
+});
+clearKeyBtn.addEventListener("click", () => {
+  clearApiKey();
+  apiKeyInput.value = "";
+  updateConfigBtn();
+  updateConfigStatus();
+});
 
-  if (/(calidad|mejor|premium|durab|original|garant)/.test(n)) {
-    return `Para calidad máxima de "${query}" te recomiendo empezar por Amazon, Apple Store o Best Buy. Tienen productos originales con garantía y políticas de devolución claras.`;
-  }
-  if (/(barat|econom|bajo precio|ahorr|gast)/.test(n)) {
-    return `Para el precio más bajo de "${query}" revisa AliExpress, Temu y eBay. Son imbatibles en precio aunque el envío puede tardar semanas. Shein es bueno para moda.`;
-  }
-  if (/(tarjeta|cr[eé]dito|pr[eé]stamo|seguro|banco|tasa)/.test(n)) {
-    return `Para productos financieros como "${query}", Google Shopping no sirve. Usa el comparador universal (Google normal) y busca comparadores como NerdWallet, Rankia, o las webs oficiales de los bancos.`;
-  }
-  if (/(envio|shipping|entrega|tiempo)/.test(n)) {
-    return `Amazon, Walmart y MercadoLibre suelen entregar en 1-3 días. AliExpress y Temu tardan 10-30 días pero son mucho más baratos. Revisa siempre las fechas antes de comprar.`;
-  }
-  if (/(rese[ñn]a|opini|review)/.test(n)) {
-    return `Para reseñas reales de "${query}" usa la tarjeta 🔍 Comparador universal: YouTube y Reddit suelen tener opiniones honestas de usuarios reales.`;
-  }
-  if (/(diferenc|comparar|vs|versus|cu[aá]l)/.test(n)) {
-    return `Mi recomendación general:\n• Empieza por 💎 Mejor calidad-precio (Google Shopping / MercadoLibre).\n• Si el producto es importante (ej. electrónica cara), sube a 🏆 Mejor calidad.\n• Si es algo que usarás poco, baja a 💰 Económica.\n• Si es un servicio/financiero, usa 🔍 Universal.`;
-  }
-  if (/(hola|buenas|saludos|hey)/.test(n)) {
-    return "¡Hola! Puedo orientarte sobre qué tienda elegir y cómo evaluar los resultados. Pregúntame lo que quieras.";
-  }
-  return `Para "${query}" te sugiero empezar con Google Shopping (tarjeta 💎) — agrega resultados de muchas tiendas. Si no encuentras lo que buscas ahí, prueba el comparador universal (🔍).`;
-}
+// ---------- Buscar ----------
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const query = queryInput.value.trim();
+  if (!query) return;
+  lastQuery = query;
+  chatHistory = [];
+  chatLog.innerHTML = "";
+  render(query);
+  recordSearch(query);
+  generateSearchSummary(query);
+  aiSummary.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 // ---------- Inicial ----------
 renderPrefs();
+updateConfigBtn();

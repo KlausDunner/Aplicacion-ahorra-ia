@@ -20,6 +20,7 @@
         <li><a href="#buscar">Buscar</a></li>
         <li><a href="#como-funciona">Cómo funciona</a></li>
         <li><a href="#preferencias">Mis preferencias</a></li>
+        <li><button id="config-btn" class="config-btn">⚙️ Configurar IA</button></li>
       </ul>
     </nav>
 
@@ -49,6 +50,14 @@
     </section>
 
     <section id="status" class="status hidden"></section>
+
+    <section id="ai-summary" class="ai-summary hidden">
+      <div class="ai-summary-header">
+        <span class="ai-label">🤖 Resumen IA</span>
+        <span id="ai-summary-status"></span>
+      </div>
+      <div id="ai-summary-content" class="ai-summary-content"></div>
+    </section>
 
     <section id="results" class="results"></section>
 
@@ -123,7 +132,28 @@
     <p>© 2026 Ahorra IA · Compara. Decide. Ahorra.</p>
   </footer>
 
-  <script src="data.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <div id="config-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close" aria-label="Cerrar">×</button>
+      <h3>⚙️ Configurar Ahorra IA</h3>
+      <p>Para activar el chat inteligente necesitas una <strong>API key gratuita</strong> de Groq. Es gratis, sin tarjeta.</p>
+      <ol class="modal-steps">
+        <li>Crea cuenta en <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a></li>
+        <li>Ve a <a href="https://console.groq.com/keys" target="_blank" rel="noopener">API Keys</a> y copia una nueva key</li>
+        <li>Pégala abajo y guarda</li>
+      </ol>
+      <input type="password" id="api-key-input" placeholder="gsk_..." />
+      <div class="modal-actions">
+        <button id="save-key" class="btn-primary">Guardar</button>
+        <button id="clear-key" class="btn-secondary">Borrar key</button>
+      </div>
+      <p class="modal-note">🔒 Tu key se guarda solo en este navegador. Nunca se comparte con nadie.</p>
+      <p id="config-status" class="config-status"></p>
+    </div>
+  </div>
+
+  <script src="data.js?v=4"></script>
+  <script src="llm.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
