@@ -191,6 +191,13 @@ chatForm.addEventListener("submit", async (e) => {
   }
 });
 
+document.querySelectorAll(".chat-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    chatInput.value = chip.dataset.q;
+    chatForm.requestSubmit();
+  });
+});
+
 function appendMsg(role, text) {
   const div = document.createElement("div");
   div.className = `msg ${role}`;
