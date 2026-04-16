@@ -104,21 +104,31 @@ function render(query) {
 }
 
 // Enhanced cards: LLM picks 3 specific products and we build store links per pick
-const PICKS_PROMPT = `Eres un experto en compras. Para la búsqueda del usuario, recomienda 3 productos específicos en JSON válido (sin markdown, sin texto extra):
+const PICKS_PROMPT = `Eres Ahorra IA. BUSCA EN INTERNET productos reales para el usuario y devuelve 3 opciones con URLs directas a la página de compra (no búsquedas).
+
+Responde en JSON válido, sin markdown, sin texto extra:
 
 {
-  "quality": {"product": "nombre modelo exacto y variante", "price": "rango USD aproximado", "reason": "1 frase justificando"},
-  "value": {"product": "...", "price": "...", "reason": "..."},
-  "cheap": {"product": "...", "price": "...", "reason": "..."}
+  "quality": {
+    "product": "nombre exacto del modelo y variante",
+    "price": "precio real encontrado con moneda",
+    "store": "nombre de la tienda",
+    "url": "URL DIRECTA al producto (no a búsqueda)",
+    "reason": "1 frase justificando"
+  },
+  "value": {"product": "...", "price": "...", "store": "...", "url": "...", "reason": "..."},
+  "cheap": {"product": "...", "price": "...", "store": "...", "url": "...", "reason": "..."}
 }
 
-"quality" = la mejor opción sin importar precio
-"value" = la mejor relación calidad-precio
-"cheap" = alternativa económica con buena calidad mínima
+REGLAS:
+- quality = mejor opción absoluta (ignora el precio)
+- value = mejor relación calidad-precio
+- cheap = alternativa económica con calidad aceptable
+- Las URLs DEBEN ser páginas específicas de producto encontradas en tu búsqueda web (Amazon, MercadoLibre, Walmart, Falabella, AliExpress, etc.)
+- Precios REALES vistos en las tiendas, con moneda clara
+- Si el usuario busca un servicio (tarjeta de crédito, seguro), sugiere productos específicos con links a páginas oficiales
 
-Sé específico con modelos/variantes reales (ej. "iPhone 15 128GB", no "iPhone"). Si la búsqueda es un servicio (ej. tarjetas de crédito), sugiere productos/marcas específicas del mercado latino.
-
-Responde SOLO el JSON, nada más.`;
+Responde SOLO el JSON.`;
 
 function extractJson(text) {
   const match = text.match(/\{[\s\S]*\}/);
@@ -129,31 +139,48 @@ async function generateSmartPicks(query) {
   if (!hasApiKey()) return;
   const picksEl = document.getElementById("smart-picks");
   picksEl.classList.remove("hidden");
-  picksEl.innerHTML = `<div class="picks-loading">🤖 Analizando y buscando las 3 mejores opciones para "${escapeHtml(query)}"...</div>`;
+  picksEl.innerHTML = `<div class="picks-loading">🌐 Buscando en internet productos reales para "${escapeHtml(query)}"... (puede tardar 10-20s)</div>`;
   try {
     const raw = await callLLM(
       [
         { role: "system", content: PICKS_PROMPT },
-        { role: "user", content: query },
+        { role: "user", content: `Busca en internet las 3 mejores opciones para: ${query}` },
       ],
-      { maxTokens: 500, temperature: 0.4 }
+      { maxTokens: 900, temperature: 0.3, model: "compound-beta" }
     );
     const data = JSON.parse(extractJson(raw));
     renderSmartPicks(data, query);
   } catch (err) {
-    picksEl.innerHTML = `<div class="picks-error">⚠️ No pude generar recomendaciones específicas: ${escapeHtml(err.message)}</div>`;
+    // Fallback al modelo normal sin búsqueda web
+    try {
+      const raw = await callLLM(
+        [
+          { role: "system", content: PICKS_PROMPT },
+          { role: "user", content: query },
+        ],
+        { maxTokens: 600, temperature: 0.3 }
+      );
+      const data = JSON.parse(extractJson(raw));
+      renderSmartPicks(data, query);
+    } catch (err2) {
+      picksEl.innerHTML = `<div class="picks-error">⚠️ No pude generar recomendaciones: ${escapeHtml(err2.message)}</div>`;
+    }
   }
+}
+
+function isValidUrl(u) {
+  try { return /^https?:\/\//.test(u) && new URL(u); } catch { return false; }
 }
 
 function smartPickCard(tierId, pick, query) {
   const tier = STORE_TIERS.find((t) => t.id === tierId);
   if (!tier || !pick || !pick.product) return "";
-  const searchQuery = pick.product;
-  const primary = tier.stores[0];
-  const others = tier.stores.slice(1, 4);
-  const primaryUrl = buildUrl(primary.url, searchQuery);
-  const otherLinks = others
-    .map((s) => `<a class="store-link" href="${buildUrl(s.url, searchQuery)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
+  const hasRealUrl = isValidUrl(pick.url);
+  const primaryUrl = hasRealUrl ? pick.url : buildUrl(tier.stores[0].url, pick.product);
+  const primaryStore = hasRealUrl && pick.store ? pick.store : tier.stores[0].name;
+  const altStores = tier.stores.slice(0, 4);
+  const otherLinks = altStores
+    .map((s) => `<a class="store-link" href="${buildUrl(s.url, pick.product)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`)
     .join("");
   return `
     <article class="result-card tier-${tier.id}">
@@ -162,10 +189,10 @@ function smartPickCard(tierId, pick, query) {
       <p class="pick-price">💵 ${escapeHtml(pick.price || "Precio variable")}</p>
       <p class="tier-desc">${escapeHtml(pick.reason || "")}</p>
       <a class="card-link primary" href="${primaryUrl}" target="_blank" rel="noopener">
-        Ver "${escapeHtml(pick.product)}" en ${escapeHtml(primary.name)} →
+        ${hasRealUrl ? "🛒 Comprar" : "🔎 Buscar"} en ${escapeHtml(primaryStore)} →
       </a>
       <div class="store-links">
-        <span class="store-links-label">También buscar en:</span>
+        <span class="store-links-label">También buscar este producto en:</span>
         ${otherLinks}
       </div>
     </article>

@@ -19,7 +19,7 @@ function hasApiKey() {
   return !!getApiKey();
 }
 
-async function callLLM(messages, { maxTokens = 400, temperature = 0.7 } = {}) {
+async function callLLM(messages, { maxTokens = 400, temperature = 0.7, model } = {}) {
   const key = getApiKey();
   if (!key) throw new Error("Falta la API key. Haz clic en ⚙️ arriba para configurarla.");
 
@@ -30,7 +30,7 @@ async function callLLM(messages, { maxTokens = 400, temperature = 0.7 } = {}) {
       Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify({
-      model: LLM_CONFIG.model,
+      model: model || LLM_CONFIG.model,
       messages,
       temperature,
       max_tokens: maxTokens,
