@@ -526,6 +526,33 @@ h2 {
   font-size: 0.85rem;
 }
 
+/* Smart picks (IA) */
+.smart-picks {
+  margin-bottom: 18px;
+}
+.picks-title {
+  font-size: 1.3rem;
+  margin: 0 0 14px;
+}
+.picks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+.picks-loading, .picks-error {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  color: var(--muted);
+}
+.pick-price {
+  color: var(--accent-2);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 6px 0;
+}
+
 /* Modal */
 .modal {
   position: fixed;
