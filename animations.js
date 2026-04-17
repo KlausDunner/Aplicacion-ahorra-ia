@@ -1,18 +1,19 @@
-// ── Pig mascot — eye tracking + tilt ─────────────────────
+// ── Pig mascot — eye tracking + tilt + mouse glow ────────
 (function () {
-  var pig    = document.getElementById('hero-pig');
-  var pupilL = document.getElementById('pig-pupil-l');
-  var pupilR = document.getElementById('pig-pupil-r');
+  var pig       = document.getElementById('hero-pig');
+  var pupilL    = document.getElementById('pig-pupil-l');
+  var pupilR    = document.getElementById('pig-pupil-r');
+  var mouseGlow = document.getElementById('pig-mouse-glow');
   if (!pig || !pupilL || !pupilR) return;
 
-  // Base pupil positions in SVG coords
-  var BLX = 170, BLY = 174;
-  var BRX = 238, BRY = 174;
-  var MAX_PUPIL = 8;   // max px in SVG units
-  var MAX_TILT  = 7;   // deg
+  var BLX = 170, BLY = 174;   // base pupil L
+  var BRX = 238, BRY = 174;   // base pupil R
+  var MAX_PUPIL = 9;
+  var MAX_TILT  = 7;
 
-  var targetTilt = 0;
+  var targetTilt  = 0;
   var currentTilt = 0;
+  var isNear      = false;
 
   document.addEventListener('mousemove', function (e) {
     var rect = pig.getBoundingClientRect();
@@ -24,21 +25,36 @@
     var dy = e.clientY - cy;
     var dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-    // Pupil movement — normalized direction × clamped distance
+    // ── Pupils ──
     var move = Math.min(dist * 0.05, MAX_PUPIL);
     var nx = dx / dist;
     var ny = dy / dist;
-
     pupilL.setAttribute('cx', (BLX + nx * move).toFixed(1));
     pupilL.setAttribute('cy', (BLY + ny * move).toFixed(1));
     pupilR.setAttribute('cx', (BRX + nx * move).toFixed(1));
     pupilR.setAttribute('cy', (BRY + ny * move).toFixed(1));
 
-    // Tilt toward mouse (horizontal only, subtle)
+    // ── Tilt ──
     targetTilt = (dx / window.innerWidth) * MAX_TILT * 2;
+
+    // ── Mouse glow inside SVG ──
+    if (mouseGlow) {
+      var nearThreshold = Math.max(rect.width, rect.height) * 0.85;
+      isNear = dist < nearThreshold;
+      mouseGlow.setAttribute('opacity', isNear ? '1' : '0');
+
+      if (isNear) {
+        // Convert screen coords → SVG viewBox coords
+        var svgW = 400, svgH = 430;
+        var svgX = ((e.clientX - rect.left) / rect.width)  * svgW;
+        var svgY = ((e.clientY - rect.top)  / rect.height) * svgH;
+        mouseGlow.setAttribute('cx', svgX.toFixed(0));
+        mouseGlow.setAttribute('cy', svgY.toFixed(0));
+      }
+    }
   });
 
-  // Smooth tilt with lerp
+  // ── Smooth tilt lerp ──
   (function lerpTilt() {
     currentTilt += (targetTilt - currentTilt) * 0.08;
     pig.style.transform = 'rotate(' + currentTilt.toFixed(2) + 'deg)';
