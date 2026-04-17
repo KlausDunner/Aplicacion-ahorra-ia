@@ -1,3 +1,35 @@
+// ── Ocultar watermark de Spline (shadow DOM) ─────────────
+(function () {
+  function hide(viewer) {
+    const root = viewer.shadowRoot;
+    if (!root) return false;
+    const el =
+      root.querySelector('#logo') ||
+      root.querySelector('a[href*="spline"]') ||
+      root.querySelector('[class*="logo"]');
+    if (el) {
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
+      return true;
+    }
+    return false;
+  }
+
+  document.querySelectorAll('spline-viewer').forEach(function (viewer) {
+    if (hide(viewer)) return;
+    // El componente carga async — observar hasta que aparezca
+    viewer.addEventListener('load', function () { hide(viewer); });
+    var mo = new MutationObserver(function () {
+      if (hide(viewer)) mo.disconnect();
+    });
+    mo.observe(viewer, { childList: true, subtree: true });
+    // Fallback por si tarda más
+    [500, 1500, 3000].forEach(function (ms) {
+      setTimeout(function () { hide(viewer); }, ms);
+    });
+  });
+})();
+
 // ── Scroll 3D tilt (ContainerScroll equivalent) ──────────
 (function () {
   const card = document.getElementById('scroll-tilt-card');
