@@ -125,23 +125,118 @@ document.querySelectorAll('.how-grid article').forEach((card) => {
   });
 });
 
-// ── Search MorphPanel — auto-expande al cargar ────────────
+// ── Search Bubble MorphPanel ──────────────────────────────
+// Animates width + height + border-radius from pill → form
 (function () {
-  var outer = document.getElementById('search-morph-outer');
-  var pill  = document.getElementById('search-morph-pill');
-  var form  = document.getElementById('search-form');
-  if (!outer || !pill || !form) return;
+  var outer  = document.getElementById('search-bubble-outer');
+  var panel  = document.getElementById('search-bubble-panel');
+  var dock   = document.getElementById('search-bubble-dock');
+  var form   = document.getElementById('search-form');
+  var input  = document.getElementById('query');
+  if (!panel || !dock || !form) return;
 
-  function openSearch() {
-    outer.classList.add('is-open');
-    form.removeAttribute('aria-hidden');
+  var isOpen     = false;
+  var pillW      = 0;
+  var PILL_H     = 44;
+  var RADIUS_OPEN = 16;
+  var EASE_OPEN  = 'cubic-bezier(0.22,1,0.36,1)';
+  var EASE_CLOSE = 'cubic-bezier(0.55,0,1,0.45)';
+
+  function storePillSize() {
+    pillW = panel.offsetWidth;
+  }
+  storePillSize();
+
+  function getExpandedSize() {
+    // Temporarily show form to measure height
+    panel.style.overflow = 'visible';
+    form.style.opacity = '0';
+    form.style.pointerEvents = 'none';
+    form.style.display = 'flex';
+    var h = form.offsetHeight;
+    form.style.display = '';
+    form.style.opacity = '';
+    form.style.pointerEvents = '';
+    panel.style.overflow = 'hidden';
+    return { w: outer.offsetWidth, h: h };
   }
 
-  // Pill click abre manualmente (en caso de que el usuario lo haya cerrado)
-  pill.addEventListener('click', openSearch);
+  function openBubble() {
+    if (isOpen) return;
+    isOpen = true;
 
-  // Auto-abrir con delay para que se vea la animación de morph al cargar
-  setTimeout(openSearch, 350);
+    var target = getExpandedSize();
+
+    // Freeze current pill dimensions as explicit px
+    panel.style.transition = 'none';
+    panel.style.width  = pillW + 'px';
+    panel.style.height = PILL_H + 'px';
+    panel.style.borderRadius = '999px';
+
+    // Force layout flush
+    panel.getBoundingClientRect();
+
+    // Animate to expanded
+    panel.style.transition =
+      'width 0.42s ' + EASE_OPEN + ',' +
+      'height 0.42s ' + EASE_OPEN + ',' +
+      'border-radius 0.42s ' + EASE_OPEN + ',' +
+      'border-color 0.2s';
+    panel.style.width  = target.w + 'px';
+    panel.style.height = target.h + 'px';
+    panel.style.borderRadius = RADIUS_OPEN + 'px';
+    panel.classList.add('is-open');
+
+    setTimeout(function () { input && input.focus(); }, 200);
+  }
+
+  function closeBubble() {
+    if (!isOpen) return;
+    isOpen = false;
+    panel.classList.remove('is-open');
+
+    panel.style.transition =
+      'width 0.34s ' + EASE_CLOSE + ',' +
+      'height 0.34s ' + EASE_CLOSE + ',' +
+      'border-radius 0.34s ' + EASE_CLOSE + ',' +
+      'border-color 0.2s';
+    panel.style.width  = pillW + 'px';
+    panel.style.height = PILL_H + 'px';
+    panel.style.borderRadius = '999px';
+
+    // Re-center after close transition
+    panel.addEventListener('transitionend', function handler() {
+      panel.removeEventListener('transitionend', handler);
+      panel.style.transition = '';
+      panel.style.width  = '';
+      panel.style.height = '';
+      panel.style.borderRadius = '';
+      storePillSize(); // refresh pill width in case of resize
+    });
+  }
+
+  // Dock click opens
+  dock.addEventListener('click', openBubble);
+
+  // Escape closes
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) closeBubble();
+  });
+
+  // Click outside closes
+  document.addEventListener('mousedown', function (e) {
+    if (isOpen && !panel.contains(e.target)) closeBubble();
+  });
+
+  // After submit: close back to bubble
+  form.addEventListener('submit', function () {
+    setTimeout(closeBubble, 80);
+  });
+
+  // Recompute pill width on resize
+  window.addEventListener('resize', function () {
+    if (!isOpen) storePillSize();
+  });
 })();
 
 // ── MorphPanel chat input ─────────────────────────────────

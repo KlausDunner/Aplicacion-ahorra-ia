@@ -78,49 +78,50 @@
 
   <main>
     <section id="buscar" class="search-section">
-      <div class="search-morph-outer" id="search-morph-outer">
+      <!-- Outer centers the bubble; panel is the animated element -->
+      <div class="search-bubble-outer" id="search-bubble-outer">
+        <div class="search-bubble-panel" id="search-bubble-panel">
 
-        <!-- Pill (estado colapsado) -->
-        <button type="button" class="search-morph-pill" id="search-morph-pill" aria-label="Abrir buscador">
-          <span class="color-orb" aria-hidden="true"></span>
-          <span class="search-pill-label">Busca en tiendas chilenas: laptop, zapatillas...</span>
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-          </svg>
-        </button>
-
-        <!-- Formulario expandido -->
-        <form id="search-form" class="search-morph-form" aria-hidden="true">
-          <div class="search-morph-header">
+          <!-- Dock bar — visible when collapsed -->
+          <div class="search-bubble-dock" id="search-bubble-dock">
             <span class="color-orb" aria-hidden="true"></span>
-            <span class="search-morph-label">Ahorra IA</span>
-            <span class="search-morph-hint">Tiendas chilenas · Precios en pesos</span>
+            <span class="search-bubble-label">Buscar con Ahorra IA</span>
           </div>
-          <div class="search-morph-row">
-            <span class="search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-              </svg>
-            </span>
-            <input
-              type="search"
-              id="query"
-              inputmode="search"
-              placeholder="laptop, tarjeta de crédito, zapatillas Nike..."
-              autocomplete="off"
-              aria-label="Qué quieres buscar"
-            />
-            <button type="submit">
-              <span>Buscar ofertas</span>
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-              </svg>
-            </button>
-          </div>
-        </form>
+
+          <!-- Expanded form — fades in when open -->
+          <form id="search-form" class="search-bubble-form">
+            <div class="search-bubble-top">
+              <span class="color-orb" aria-hidden="true"></span>
+              <span class="search-bubble-title">Ahorra IA</span>
+              <span class="search-bubble-hint">Tiendas chilenas · Precios en pesos</span>
+            </div>
+            <div class="search-bubble-row">
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                </svg>
+              </span>
+              <input
+                type="search"
+                id="query"
+                inputmode="search"
+                placeholder="laptop, zapatillas Nike, tarjeta de crédito..."
+                autocomplete="off"
+                aria-label="Qué quieres buscar"
+              />
+              <button type="submit">
+                <span>Buscar</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+
+        </div>
       </div>
 
-      <p class="search-hint">
+      <p class="search-hint" id="search-hint">
         Busca en <strong>tiendas chilenas</strong>. Te entregamos links directos con precios reales en pesos.
       </p>
     </section>

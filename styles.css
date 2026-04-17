@@ -201,135 +201,145 @@ h2 {
 /* Search */
 .search-section { margin-top: -50px; }
 
-/* ── Search MorphPanel ────────────────────────────────────
-   Same pill→expand pattern as MorphPanel, auto-opens on load */
-.search-morph-outer { position: relative; }
+/* ── Search Bubble / MorphPanel ──────────────────────────
+   Starts as a small centered pill, expands to full form  */
 
-.search-morph-pill {
+/* Outer: centers the bubble horizontally */
+.search-bubble-outer {
+  display: flex;
+  justify-content: center;
+}
+
+/* Panel: the animated element — starts as pill */
+.search-bubble-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  /* Pill dimensions */
+  width: auto;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.search-bubble-panel:hover { border-color: var(--accent); }
+
+/* Dock bar (pill content) */
+.search-bubble-dock {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 12px 18px;
-  cursor: pointer;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 20px;
+  white-space: nowrap;
+  user-select: none;
   color: var(--muted);
-  font-size: 0.95rem;
-  font-family: inherit;
-  text-align: left;
-  box-shadow: var(--shadow);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 0.93rem;
+  transition: opacity 0.15s;
 }
-.search-morph-pill:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124,92,255,0.12), var(--shadow);
-}
-.search-pill-label { flex: 1; }
+.search-bubble-label { color: var(--text); }
 
-.search-morph-form {
-  display: none;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.search-morph-outer.is-open .search-morph-pill { display: none; }
-.search-morph-outer.is-open .search-morph-form {
+/* Expanded form — hidden until open */
+.search-bubble-form {
   display: flex;
-  animation: morph-open 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s 0.12s;
 }
 
-.search-morph-header {
+/* ── Open state (set by JS) ── */
+.search-bubble-panel.is-open {
+  cursor: default;
+  /* width/height/border-radius animated by JS via inline style */
+}
+.search-bubble-panel.is-open .search-bubble-dock {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute; /* take out of flow once hidden */
+}
+.search-bubble-panel.is-open .search-bubble-form {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Form layout */
+.search-bubble-top {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 11px 14px 10px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.search-morph-label {
+.search-bubble-title {
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--accent-2);
 }
-.search-morph-hint {
+.search-bubble-hint {
   font-size: 0.78rem;
   color: var(--muted);
   margin-left: auto;
 }
-
-.search-morph-row {
+.search-bubble-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-}
-
-/* Keep original .search-box for backward compat (used nowhere now but safe) */
-.search-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  display: flex;
-  gap: 10px;
-  box-shadow: var(--shadow);
-}
-/* Search icon inside the flex row */
-.search-icon {
-  display: flex;
-  align-items: center;
-  color: var(--muted);
   flex-shrink: 0;
 }
-
-.search-morph-row input[type="search"] {
+.search-bubble-row input[type="search"] {
   flex: 1;
   background: transparent;
   border: none;
   color: var(--text);
-  padding: 12px 4px;
+  padding: 10px 4px;
   font-size: 1rem;
   outline: none;
   font-family: inherit;
 }
-.search-morph-row input[type="search"]::-webkit-search-cancel-button { display: none; }
-.search-morph-form:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124,92,255,0.2), var(--shadow);
-}
-.search-morph-row button[type="submit"] {
+.search-bubble-row input[type="search"]::-webkit-search-cancel-button { display: none; }
+.search-bubble-row button[type="submit"] {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #0b0f24;
-  border: 0;
-  padding: 10px 20px;
+  border: none;
+  padding: 9px 18px;
   border-radius: 10px;
   font-weight: 700;
+  font-size: 0.9rem;
+  font-family: inherit;
   cursor: pointer;
-  font-size: 0.95rem;
   white-space: nowrap;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
-  font-family: inherit;
+  transition: filter 0.15s;
 }
-.search-morph-row button[type="submit"]:hover { filter: brightness(1.08); }
-.search-morph-row button[type="submit"]::after {
+.search-bubble-row button[type="submit"]:hover { filter: brightness(1.1); }
+.search-bubble-row button[type="submit"]::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
   transform: translateX(-100%);
 }
-.search-morph-row button[type="submit"]:hover::after {
+.search-bubble-row button[type="submit"]:hover::after {
   transform: translateX(100%);
   transition: transform 0.5s ease;
+}
+.search-bubble-panel:focus-within { border-color: var(--accent); }
+/* Search icon */
+.search-icon {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .filters {
@@ -1254,10 +1264,11 @@ spline-viewer {
 }
 
 @media (max-width: 600px) {
-  .search-morph-row { flex-wrap: wrap; }
-  .search-morph-row input[type="search"] { width: 100%; padding: 10px 4px; }
-  .search-morph-row button[type="submit"] { flex: 1; padding: 14px; justify-content: center; }
+  .search-bubble-row { flex-wrap: wrap; }
+  .search-bubble-row input[type="search"] { width: 100%; }
+  .search-bubble-row button[type="submit"] { flex: 1; justify-content: center; }
   .search-icon { display: none; }
+  .search-bubble-hint { display: none; }
   .nav-links { display: none; }
   .hero-eyebrow { font-size: 0.75rem; padding: 5px 12px; }
   .hero-spline { height: 220px; }
