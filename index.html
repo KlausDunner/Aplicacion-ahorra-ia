@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js"></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -20,6 +21,7 @@
     <span class="blob blob-2"></span>
     <span class="blob blob-3"></span>
   </div>
+  <div class="spotlight-cursor" aria-hidden="true"></div>
 
   <header class="hero">
     <nav class="nav">
@@ -50,18 +52,27 @@
     </nav>
 
     <div class="hero-content">
-      <span class="hero-eyebrow">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        Inteligencia artificial · Tiendas chilenas
-      </span>
-      <h1>
-        <span class="h1-line">Compra inteligente.</span>
-        <span class="h1-line h1-gradient">Ahorra más.</span>
-      </h1>
-      <p class="subtitle">
-        Analizamos miles de productos en toda la web y te entregamos solo las 3 mejores opciones:
-        la de mayor calidad, la mejor relación calidad-precio y la alternativa más económica.
-      </p>
+      <div class="hero-text">
+        <span class="hero-eyebrow reveal-item">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          Inteligencia artificial · Tiendas chilenas
+        </span>
+        <h1>
+          <span class="h1-line reveal-item" style="--delay:0.1s">Compra inteligente.</span>
+          <span class="h1-line h1-gradient reveal-item" style="--delay:0.2s">Ahorra más.</span>
+        </h1>
+        <p class="subtitle reveal-item" style="--delay:0.3s">
+          Analizamos miles de productos en toda la web y te entregamos solo las 3 mejores opciones:
+          la de mayor calidad, la mejor relación calidad-precio y la alternativa más económica.
+        </p>
+      </div>
+      <div class="hero-spline reveal-item" style="--delay:0.4s" aria-hidden="true">
+        <div class="spline-glow"></div>
+        <spline-viewer
+          url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+          loading-anim-type="spinner-big-dark"
+        ></spline-viewer>
+      </div>
     </div>
   </header>
 
@@ -146,9 +157,9 @@
     </section>
 
     <section id="como-funciona" class="how">
-      <h2>Cómo funciona</h2>
+      <h2 class="scroll-reveal">Cómo funciona</h2>
       <div class="how-grid">
-        <article>
+        <article class="scroll-reveal" style="--delay:0s">
           <span class="step">1</span>
           <h3>Comprender al usuario</h3>
           <p>
@@ -156,7 +167,7 @@
             gustos, preferencias y hábitos.
           </p>
         </article>
-        <article>
+        <article class="scroll-reveal" style="--delay:0.1s">
           <span class="step">2</span>
           <h3>Filtrar información</h3>
           <p>
@@ -164,7 +175,7 @@
             opciones según lo que realmente buscas.
           </p>
         </article>
-        <article>
+        <article class="scroll-reveal" style="--delay:0.2s">
           <span class="step">3</span>
           <h3>Adaptarse al mercado</h3>
           <p>
@@ -172,7 +183,7 @@
             y lo que ya no está disponible.
           </p>
         </article>
-        <article>
+        <article class="scroll-reveal" style="--delay:0.3s">
           <span class="step">4</span>
           <h3>Decidir con criterio</h3>
           <p>
@@ -227,5 +238,6 @@
   <script src="data.js?v=10"></script>
   <script src="llm.js?v=10"></script>
   <script src="app.js?v=10"></script>
+  <script src="animations.js?v=1"></script>
 </body>
 </html>
