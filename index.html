@@ -9,7 +9,6 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
   <link rel="stylesheet" href="styles.css?v=5" />
-  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js"></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -60,12 +59,52 @@
           la de mayor calidad, la mejor relación calidad-precio y la alternativa más económica.
         </p>
       </div>
-      <div class="hero-spline reveal-item" style="--delay:0.4s" aria-hidden="true">
-        <div class="spline-glow"></div>
-        <spline-viewer
-          url="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-          loading-anim-type="spinner-big-dark"
-        ></spline-viewer>
+      <div class="hero-spline reveal-item" style="--delay:0.4s" aria-label="Mascota Ahorra IA">
+        <div class="pig-wrap" id="pig-wrap">
+          <svg id="hero-pig" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+            <!-- Shadow -->
+            <ellipse cx="200" cy="400" rx="85" ry="14" fill="rgba(180,120,160,0.18)"/>
+            <!-- Body -->
+            <ellipse cx="200" cy="305" rx="98" ry="82" fill="#ffb3d1"/>
+            <!-- Back legs -->
+            <rect x="128" y="352" width="34" height="38" rx="17" fill="#ff8fb8"/>
+            <rect x="238" y="352" width="34" height="38" rx="17" fill="#ff8fb8"/>
+            <!-- Tail -->
+            <path d="M 296 278 Q 336 255 330 282 Q 324 308 300 296" stroke="#ff8fb8" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <!-- Head -->
+            <circle cx="200" cy="185" r="92" fill="#ffb3d1"/>
+            <!-- Left ear outer -->
+            <ellipse cx="124" cy="110" rx="30" ry="38" fill="#ff8fb8" transform="rotate(-18 124 110)"/>
+            <!-- Left ear inner -->
+            <ellipse cx="124" cy="112" rx="18" ry="24" fill="#ffc8df" transform="rotate(-18 124 112)"/>
+            <!-- Right ear outer -->
+            <ellipse cx="276" cy="110" rx="30" ry="38" fill="#ff8fb8" transform="rotate(18 276 110)"/>
+            <!-- Right ear inner -->
+            <ellipse cx="276" cy="112" rx="18" ry="24" fill="#ffc8df" transform="rotate(18 276 112)"/>
+            <!-- Eye whites -->
+            <circle cx="166" cy="170" r="24" fill="white"/>
+            <circle cx="234" cy="170" r="24" fill="white"/>
+            <!-- Pupils (JS moves these) -->
+            <circle id="pig-pupil-l" cx="170" cy="174" r="13" fill="#1a1a2e"/>
+            <circle id="pig-pupil-r" cx="238" cy="174" r="13" fill="#1a1a2e"/>
+            <!-- Eye shine -->
+            <circle cx="175" cy="165" r="6" fill="white"/>
+            <circle cx="243" cy="165" r="6" fill="white"/>
+            <!-- Snout -->
+            <ellipse cx="200" cy="218" rx="44" ry="31" fill="#ff8fb8"/>
+            <!-- Nostrils -->
+            <ellipse cx="184" cy="221" rx="10" ry="8" fill="#d4547a"/>
+            <ellipse cx="216" cy="221" rx="10" ry="8" fill="#d4547a"/>
+            <!-- Smile -->
+            <path d="M 170 242 Q 200 266 230 242" stroke="#d4547a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+            <!-- Blush left -->
+            <ellipse cx="136" cy="200" rx="24" ry="14" fill="#ff6aaa" opacity="0.22"/>
+            <!-- Blush right -->
+            <ellipse cx="264" cy="200" rx="24" ry="14" fill="#ff6aaa" opacity="0.22"/>
+            <!-- Coin slot on head (chanchito alcancía detail) -->
+            <rect x="188" y="94" width="24" height="6" rx="3" fill="#d4547a" opacity="0.6"/>
+          </svg>
+        </div>
       </div>
     </div>
   </header>

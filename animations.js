@@ -1,33 +1,49 @@
-// ── Ocultar watermark de Spline (shadow DOM) ─────────────
+// ── Pig mascot — eye tracking + tilt ─────────────────────
 (function () {
-  function hide(viewer) {
-    const root = viewer.shadowRoot;
-    if (!root) return false;
-    const el =
-      root.querySelector('#logo') ||
-      root.querySelector('a[href*="spline"]') ||
-      root.querySelector('[class*="logo"]');
-    if (el) {
-      el.style.visibility = 'hidden';
-      el.style.pointerEvents = 'none';
-      return true;
-    }
-    return false;
-  }
+  var pig    = document.getElementById('hero-pig');
+  var pupilL = document.getElementById('pig-pupil-l');
+  var pupilR = document.getElementById('pig-pupil-r');
+  if (!pig || !pupilL || !pupilR) return;
 
-  document.querySelectorAll('spline-viewer').forEach(function (viewer) {
-    if (hide(viewer)) return;
-    // El componente carga async — observar hasta que aparezca
-    viewer.addEventListener('load', function () { hide(viewer); });
-    var mo = new MutationObserver(function () {
-      if (hide(viewer)) mo.disconnect();
-    });
-    mo.observe(viewer, { childList: true, subtree: true });
-    // Fallback por si tarda más
-    [500, 1500, 3000].forEach(function (ms) {
-      setTimeout(function () { hide(viewer); }, ms);
-    });
+  // Base pupil positions in SVG coords
+  var BLX = 170, BLY = 174;
+  var BRX = 238, BRY = 174;
+  var MAX_PUPIL = 8;   // max px in SVG units
+  var MAX_TILT  = 7;   // deg
+
+  var targetTilt = 0;
+  var currentTilt = 0;
+
+  document.addEventListener('mousemove', function (e) {
+    var rect = pig.getBoundingClientRect();
+    if (rect.width === 0) return;
+
+    var cx = rect.left + rect.width  / 2;
+    var cy = rect.top  + rect.height / 2;
+    var dx = e.clientX - cx;
+    var dy = e.clientY - cy;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+    // Pupil movement — normalized direction × clamped distance
+    var move = Math.min(dist * 0.05, MAX_PUPIL);
+    var nx = dx / dist;
+    var ny = dy / dist;
+
+    pupilL.setAttribute('cx', (BLX + nx * move).toFixed(1));
+    pupilL.setAttribute('cy', (BLY + ny * move).toFixed(1));
+    pupilR.setAttribute('cx', (BRX + nx * move).toFixed(1));
+    pupilR.setAttribute('cy', (BRY + ny * move).toFixed(1));
+
+    // Tilt toward mouse (horizontal only, subtle)
+    targetTilt = (dx / window.innerWidth) * MAX_TILT * 2;
   });
+
+  // Smooth tilt with lerp
+  (function lerpTilt() {
+    currentTilt += (targetTilt - currentTilt) * 0.08;
+    pig.style.transform = 'rotate(' + currentTilt.toFixed(2) + 'deg)';
+    requestAnimationFrame(lerpTilt);
+  })();
 })();
 
 // ── Scroll 3D tilt (ContainerScroll equivalent) ──────────
