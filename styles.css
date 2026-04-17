@@ -435,6 +435,194 @@ h2 {
   text-decoration: none;
 }
 
+/* ── Color Orb (CSS Houdini @property) ───────────────────
+   Equivalent to the ColorOrb React component from 21st.dev */
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.color-orb {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  transform: scale(1.1);
+}
+.color-orb::before {
+  content: '';
+  position: absolute;
+  inset: -60%;
+  background:
+    conic-gradient(from calc(var(--angle) * 2) at 25% 70%,
+      oklch(65% 0.25 280), transparent 20% 80%, oklch(65% 0.25 280)),
+    conic-gradient(from calc(var(--angle) * 2) at 45% 75%,
+      oklch(75% 0.18 200), transparent 30% 60%, oklch(75% 0.18 200)),
+    conic-gradient(from calc(var(--angle) * -3) at 80% 20%,
+      oklch(70% 0.22 330), transparent 40% 60%, oklch(70% 0.22 330)),
+    conic-gradient(from calc(var(--angle) * 2) at 15% 5%,
+      oklch(75% 0.18 200), transparent 10% 90%, oklch(75% 0.18 200));
+  filter: blur(3.5px) contrast(1.6);
+  animation: orb-spin 20s linear infinite;
+}
+@keyframes orb-spin { to { --angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) {
+  .color-orb::before { animation: none; }
+}
+
+/* ── MorphPanel chat input ────────────────────────────────
+   Port of the MorphPanel component from 21st.dev */
+.chat-morph-outer { position: relative; }
+
+/* Collapsed pill */
+.chat-morph-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.93rem;
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.chat-morph-pill:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+  color: var(--text);
+}
+.chat-pill-label { flex: 1; }
+.chat-pill-arrow {
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.chat-morph-pill:hover .chat-pill-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* Expanded form — starts hidden */
+.chat-morph-form {
+  display: none;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Open state */
+.chat-morph-outer.is-open .chat-morph-pill { display: none; }
+.chat-morph-outer.is-open .chat-morph-form {
+  display: flex;
+  animation: morph-open 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes morph-open {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(6px);
+    border-radius: 999px;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    border-radius: 16px;
+  }
+}
+
+.chat-morph-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.chat-morph-label {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.chat-morph-keys {
+  display: flex;
+  gap: 3px;
+}
+.chat-morph-keys kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  min-width: 20px;
+  padding: 0 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-family: inherit;
+}
+
+.chat-morph-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  min-height: 80px;
+}
+.chat-morph-textarea::placeholder { color: var(--muted); }
+
+.chat-morph-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.chat-morph-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+}
+.chat-morph-cancel:hover { border-color: var(--bad); color: var(--bad); }
+.chat-morph-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: filter 0.15s;
+}
+.chat-morph-send:hover { filter: brightness(1.12); }
+
 /* Chat */
 .chat {
   background: var(--surface);
@@ -500,29 +688,7 @@ h2 {
   transform: translateY(-1px);
 }
 
-.chat-form {
-  display: flex;
-  gap: 10px;
-}
-.chat-form input {
-  flex: 1;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 12px 14px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  outline: none;
-}
-.chat-form button {
-  background: var(--accent);
-  color: #fff;
-  border: 0;
-  padding: 0 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-}
+/* .chat-form replaced by .chat-morph-form above */
 
 /* How it works */
 .how { border-top: 1px solid var(--border); }

@@ -125,6 +125,55 @@ document.querySelectorAll('.how-grid article').forEach((card) => {
   });
 });
 
+// ── MorphPanel chat input ─────────────────────────────────
+(function () {
+  var outer    = document.getElementById('chat-morph-outer');
+  var pill     = document.getElementById('chat-morph-pill');
+  var cancel   = document.getElementById('chat-morph-cancel');
+  var form     = document.getElementById('chat-form');
+  var textarea = document.getElementById('chat-input');
+  if (!outer || !pill) return;
+
+  function open() {
+    outer.classList.add('is-open');
+    form.removeAttribute('aria-hidden');
+    setTimeout(function () { textarea && textarea.focus(); }, 50);
+  }
+
+  function close() {
+    outer.classList.remove('is-open');
+    form.setAttribute('aria-hidden', 'true');
+  }
+
+  pill.addEventListener('click', open);
+  if (cancel) cancel.addEventListener('click', close);
+
+  if (textarea) {
+    textarea.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        if (form.requestSubmit) form.requestSubmit();
+        else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      }
+    });
+  }
+
+  // Click outside to close
+  document.addEventListener('mousedown', function (e) {
+    if (outer.classList.contains('is-open') && !outer.contains(e.target)) {
+      close();
+    }
+  });
+
+  // Open automatically when a chat-chip is clicked
+  document.querySelectorAll('.chat-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      if (!outer.classList.contains('is-open')) open();
+    });
+  });
+})();
+
 // Magnetic button — search submit
 (function () {
   const btn = document.querySelector('.search-box button[type="submit"]');

@@ -139,21 +139,43 @@
         <button class="chat-chip" data-q="¿Qué opinan los usuarios?">Opiniones</button>
         <button class="chat-chip" data-q="¿Dónde es más confiable comprarlo?">Dónde comprar</button>
       </div>
-      <form id="chat-form" class="chat-form">
-        <input
-          type="text"
-          id="chat-input"
-          placeholder="Ej: ¿cuál dura más batería? ¿vale la pena pagar más?"
-          autocomplete="off"
-          aria-label="Escribe tu pregunta"
-        />
-        <button type="submit" aria-label="Enviar pregunta">
-          <span>Enviar</span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m22 2-7 20-4-9-9-4 20-7z" />
+      <!-- MorphPanel chat input -->
+      <div class="chat-morph-outer" id="chat-morph-outer">
+        <button type="button" class="chat-morph-pill" id="chat-morph-pill" aria-label="Abrir chat IA">
+          <span class="color-orb" aria-hidden="true"></span>
+          <span class="chat-pill-label">Pregunta sobre los productos...</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chat-pill-arrow">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
           </svg>
         </button>
-      </form>
+
+        <form id="chat-form" class="chat-morph-form" aria-hidden="true">
+          <div class="chat-morph-header">
+            <span class="color-orb" aria-hidden="true"></span>
+            <span class="chat-morph-label">Ahorra IA</span>
+            <div class="chat-morph-keys" aria-hidden="true">
+              <kbd>⌘</kbd><kbd>Enter</kbd>
+            </div>
+          </div>
+          <textarea
+            id="chat-input"
+            class="chat-morph-textarea"
+            placeholder="Ej: ¿cuál dura más batería? ¿vale la pena pagar más?"
+            autocomplete="off"
+            aria-label="Escribe tu pregunta"
+            rows="3"
+          ></textarea>
+          <div class="chat-morph-footer">
+            <button type="button" class="chat-morph-cancel" id="chat-morph-cancel">Cancelar</button>
+            <button type="submit" class="chat-morph-send" aria-label="Enviar pregunta">
+              <span>Enviar</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m22 2-7 20-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
     </section>
 
     <!-- ── Scroll 3D tilt preview ── -->
