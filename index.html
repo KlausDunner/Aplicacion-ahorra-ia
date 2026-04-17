@@ -4,28 +4,60 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ahorra IA — Encuentra las mejores ofertas con inteligencia artificial</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="styles.css?v=4" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <meta name="theme-color" content="#0b1020" />
 </head>
 <body>
+  <div class="bg-mesh" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
   <header class="hero">
     <nav class="nav">
       <div class="logo">
-        <span class="logo-mark">◆</span>
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2 3 7l9 5 9-5-9-5z" />
+            <path d="M3 17l9 5 9-5" />
+            <path d="M3 12l9 5 9-5" />
+          </svg>
+        </span>
         <span class="logo-text">Ahorra<strong>IA</strong></span>
       </div>
       <ul class="nav-links">
         <li><a href="#buscar">Buscar</a></li>
         <li><a href="#como-funciona">Cómo funciona</a></li>
         <li><a href="#preferencias">Mis preferencias</a></li>
-        <li><button id="config-btn" class="config-btn">⚙️ Configurar IA</button></li>
+        <li>
+          <button id="config-btn" class="config-btn" aria-label="Configurar IA">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span>Configurar IA</span>
+          </button>
+        </li>
       </ul>
     </nav>
 
     <div class="hero-content">
-      <h1>Compra inteligente. <span class="accent">Ahorra más.</span></h1>
+      <span class="hero-eyebrow">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        Inteligencia artificial · Tiendas chilenas
+      </span>
+      <h1>
+        <span class="h1-line">Compra inteligente.</span>
+        <span class="h1-line h1-gradient">Ahorra más.</span>
+      </h1>
       <p class="subtitle">
         Analizamos miles de productos en toda la web y te entregamos solo las 3 mejores opciones:
         la de mayor calidad, la mejor relación calidad-precio y la alternativa más económica.
@@ -36,16 +68,30 @@
   <main>
     <section id="buscar" class="search-section">
       <form id="search-form" class="search-box">
+        <span class="search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </span>
         <input
-          type="text"
+          type="search"
           id="query"
-          placeholder="Busca en tiendas chilenas: laptop, tarjeta de crédito, zapatillas, seguro auto..."
+          inputmode="search"
+          placeholder="Busca en tiendas chilenas: laptop, tarjeta de crédito, zapatillas..."
           autocomplete="off"
+          aria-label="Qué quieres buscar"
         />
-        <button type="submit">Buscar ofertas</button>
+        <button type="submit">
+          <span>Buscar ofertas</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </button>
       </form>
       <p class="search-hint">
-        🇨🇱 Busca en <strong>tiendas chilenas</strong>. Te entregamos links directos con precios reales en pesos.
+        Busca en <strong>tiendas chilenas</strong>. Te entregamos links directos con precios reales en pesos.
       </p>
     </section>
 
@@ -53,7 +99,12 @@
 
     <section id="ai-summary" class="ai-summary hidden">
       <div class="ai-summary-header">
-        <span class="ai-label">🤖 Resumen IA</span>
+        <span class="ai-label">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3H5a3 3 0 0 0 0 6h1a3 3 0 0 0 3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0 3-3h1a3 3 0 0 0 0-6h-1a3 3 0 0 0-3-3V5a3 3 0 0 0-3-3z" />
+          </svg>
+          Resumen IA
+        </span>
         <span id="ai-summary-status"></span>
       </div>
       <div id="ai-summary-content" class="ai-summary-content"></div>
@@ -69,13 +120,13 @@
       <div id="chat-log" class="chat-log"></div>
       <div id="chat-suggestions" class="chat-suggestions">
         <span class="suggestions-label">Preguntas rápidas:</span>
-        <button class="chat-chip" data-q="¿Cuáles son las especificaciones principales?">📋 Especificaciones</button>
-        <button class="chat-chip" data-q="Dame pros y contras">⚖️ Pros y contras</button>
-        <button class="chat-chip" data-q="¿Vale la pena por el precio?">💰 ¿Vale la pena?</button>
-        <button class="chat-chip" data-q="¿Qué alternativas más baratas hay?">🔄 Alternativas más baratas</button>
-        <button class="chat-chip" data-q="Compara las 3 opciones que me mostraste">🔍 Comparar opciones</button>
-        <button class="chat-chip" data-q="¿Qué opinan los usuarios?">💬 Opiniones</button>
-        <button class="chat-chip" data-q="¿Dónde es más confiable comprarlo?">🛡️ Dónde comprar</button>
+        <button class="chat-chip" data-q="¿Cuáles son las especificaciones principales?">Especificaciones</button>
+        <button class="chat-chip" data-q="Dame pros y contras">Pros y contras</button>
+        <button class="chat-chip" data-q="¿Vale la pena por el precio?">¿Vale la pena?</button>
+        <button class="chat-chip" data-q="¿Qué alternativas más baratas hay?">Alternativas baratas</button>
+        <button class="chat-chip" data-q="Compara las 3 opciones que me mostraste">Comparar opciones</button>
+        <button class="chat-chip" data-q="¿Qué opinan los usuarios?">Opiniones</button>
+        <button class="chat-chip" data-q="¿Dónde es más confiable comprarlo?">Dónde comprar</button>
       </div>
       <form id="chat-form" class="chat-form">
         <input
@@ -83,8 +134,14 @@
           id="chat-input"
           placeholder="Ej: ¿cuál dura más batería? ¿vale la pena pagar más?"
           autocomplete="off"
+          aria-label="Escribe tu pregunta"
         />
-        <button type="submit">Enviar</button>
+        <button type="submit" aria-label="Enviar pregunta">
+          <span>Enviar</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m22 2-7 20-4-9-9-4 20-7z" />
+          </svg>
+        </button>
       </form>
     </section>
 
@@ -144,20 +201,25 @@
 
   <div id="config-modal" class="modal hidden">
     <div class="modal-content">
-      <button id="modal-close" class="modal-close" aria-label="Cerrar">×</button>
-      <h3>⚙️ Configurar Ahorra IA</h3>
+      <button id="modal-close" class="modal-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+      <h3>Configurar Ahorra IA</h3>
       <p>Para activar el chat inteligente necesitas una <strong>API key gratuita</strong> de Groq. Es gratis, sin tarjeta.</p>
       <ol class="modal-steps">
         <li>Crea cuenta en <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a></li>
         <li>Ve a <a href="https://console.groq.com/keys" target="_blank" rel="noopener">API Keys</a> y copia una nueva key</li>
         <li>Pégala abajo y guarda</li>
       </ol>
-      <input type="password" id="api-key-input" placeholder="gsk_..." />
+      <input type="password" id="api-key-input" placeholder="gsk_..." aria-label="API key de Groq" />
       <div class="modal-actions">
         <button id="save-key" class="btn-primary">Guardar</button>
         <button id="clear-key" class="btn-secondary">Borrar key</button>
       </div>
-      <p class="modal-note">🔒 Tu key se guarda solo en este navegador. Nunca se comparte con nadie.</p>
+      <p class="modal-note">Tu key se guarda solo en este navegador. Nunca se comparte con nadie.</p>
       <p id="config-status" class="config-status"></p>
     </div>
   </div>
