@@ -1,4 +1,40 @@
-// Spotlight cursor — smooth lerp follow
+// ── Scroll 3D tilt (ContainerScroll equivalent) ──────────
+(function () {
+  const card = document.getElementById('scroll-tilt-card');
+  const header = document.querySelector('.scroll-tilt-header');
+  if (!card) return;
+
+  const isMobile = () => window.innerWidth <= 768;
+
+  function update() {
+    const wrapper = card.closest('.scroll-tilt-wrapper');
+    const rect = wrapper.getBoundingClientRect();
+    const viewH = window.innerHeight;
+
+    // progress 0 → card enters viewport bottom, 1 → card centre reaches viewport centre
+    const raw = 1 - (rect.top + rect.height * 0.3) / viewH;
+    const p = Math.max(0, Math.min(1, raw));
+
+    const maxRotate = isMobile() ? 8 : 20;
+    const rotateX   = maxRotate * (1 - p);
+    const scale     = isMobile()
+      ? 0.9 + 0.1 * p          // mobile: 0.9 → 1.0
+      : 1.05 - 0.05 * p;       // desktop: 1.05 → 1.0
+
+    card.style.transform = `rotateX(${rotateX}deg) scale(${scale})`;
+
+    if (header) {
+      const ty = -p * 60;
+      header.style.transform = `translateY(${ty}px)`;
+    }
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
+// ── Spotlight cursor — smooth lerp follow ────────────────
 (function () {
   const el = document.querySelector('.spotlight-cursor');
   if (!el || window.matchMedia('(max-width:600px)').matches) return;
