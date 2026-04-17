@@ -78,29 +78,48 @@
 
   <main>
     <section id="buscar" class="search-section">
-      <form id="search-form" class="search-box">
-        <span class="search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-        </span>
-        <input
-          type="search"
-          id="query"
-          inputmode="search"
-          placeholder="Busca en tiendas chilenas: laptop, tarjeta de crédito, zapatillas..."
-          autocomplete="off"
-          aria-label="Qué quieres buscar"
-        />
-        <button type="submit">
-          <span>Buscar ofertas</span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
+      <div class="search-morph-outer" id="search-morph-outer">
+
+        <!-- Pill (estado colapsado) -->
+        <button type="button" class="search-morph-pill" id="search-morph-pill" aria-label="Abrir buscador">
+          <span class="color-orb" aria-hidden="true"></span>
+          <span class="search-pill-label">Busca en tiendas chilenas: laptop, zapatillas...</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
         </button>
-      </form>
+
+        <!-- Formulario expandido -->
+        <form id="search-form" class="search-morph-form" aria-hidden="true">
+          <div class="search-morph-header">
+            <span class="color-orb" aria-hidden="true"></span>
+            <span class="search-morph-label">Ahorra IA</span>
+            <span class="search-morph-hint">Tiendas chilenas · Precios en pesos</span>
+          </div>
+          <div class="search-morph-row">
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </span>
+            <input
+              type="search"
+              id="query"
+              inputmode="search"
+              placeholder="laptop, tarjeta de crédito, zapatillas Nike..."
+              autocomplete="off"
+              aria-label="Qué quieres buscar"
+            />
+            <button type="submit">
+              <span>Buscar ofertas</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
       <p class="search-hint">
         Busca en <strong>tiendas chilenas</strong>. Te entregamos links directos con precios reales en pesos.
       </p>

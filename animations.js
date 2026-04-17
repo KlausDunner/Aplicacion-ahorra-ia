@@ -125,6 +125,25 @@ document.querySelectorAll('.how-grid article').forEach((card) => {
   });
 });
 
+// ── Search MorphPanel — auto-expande al cargar ────────────
+(function () {
+  var outer = document.getElementById('search-morph-outer');
+  var pill  = document.getElementById('search-morph-pill');
+  var form  = document.getElementById('search-form');
+  if (!outer || !pill || !form) return;
+
+  function openSearch() {
+    outer.classList.add('is-open');
+    form.removeAttribute('aria-hidden');
+  }
+
+  // Pill click abre manualmente (en caso de que el usuario lo haya cerrado)
+  pill.addEventListener('click', openSearch);
+
+  // Auto-abrir con delay para que se vea la animación de morph al cargar
+  setTimeout(openSearch, 350);
+})();
+
 // ── MorphPanel chat input ─────────────────────────────────
 (function () {
   var outer    = document.getElementById('chat-morph-outer');
